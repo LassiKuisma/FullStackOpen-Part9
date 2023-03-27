@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "calculateExercises": "ts-node exerciseCalculator.ts",
     "start": "ts-node index.ts",
     "dev": "ts-node-dev index.ts",
     "lint": "eslint --ext .ts ."

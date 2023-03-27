@@ -8,7 +8,7 @@ interface ExerciseReport {
   average: number;
 }
 
-const calculateExercises = (
+export const calculateExercises = (
   hoursPerDay: number[],
   target: number
 ): ExerciseReport => {
@@ -57,32 +57,3 @@ const calculateExercises = (
     average,
   };
 };
-
-interface ExerciseInput {
-  target: number;
-  hours: number[];
-}
-
-const parseExerciseArguments = (args: string[]): ExerciseInput | Error => {
-  if (args.length < 4) return new Error('Not enough arguments');
-
-  const target = Number(args[2]);
-  const hours = args.slice(3).map((a) => Number(a));
-
-  if (isNaN(target) || hours.some((a) => isNaN(a))) {
-    return new Error('Provided values were not numbers!');
-  }
-
-  return {
-    target,
-    hours,
-  };
-};
-
-const exerciseArgs = parseExerciseArguments(process.argv);
-
-if (exerciseArgs instanceof Error) {
-  console.log('Something went wrong:', exerciseArgs.message);
-} else {
-  console.log(calculateExercises(exerciseArgs.hours, exerciseArgs.target));
-}
