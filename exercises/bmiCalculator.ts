@@ -22,4 +22,35 @@ const calculateBmi = (height: number, weight: number): string => {
   return highest.name;
 };
 
-console.log(calculateBmi(180, 74));
+interface Measurements {
+  height: number;
+  weight: number;
+}
+
+const parseBmiArguments = (args: string[]): Measurements | Error => {
+  if (args.length > 4) return new Error('Too many arguments');
+  if (args.length < 4) return new Error('Not enough arguments');
+
+  const height = Number(args[2]);
+  const weight = Number(args[3]);
+
+  if (isNaN(height) || isNaN(weight)) {
+    return new Error('Provided values were not numbers');
+  }
+
+  return {
+    height,
+    weight,
+  };
+};
+
+const bmiArgs = parseBmiArguments(process.argv);
+
+if (bmiArgs instanceof Error) {
+  console.log('Something went wrong:', bmiArgs.message);
+} else {
+  console.log(
+    `Bmi for ${bmiArgs.height}cm, ${bmiArgs.weight}kg is:`,
+    calculateBmi(bmiArgs.height, bmiArgs.weight)
+  );
+}
