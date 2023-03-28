@@ -4,13 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.get('/ping', (_req, res) => {
-    console.log('ping');
-    res.send('pong');
+const diagnosisService_1 = __importDefault(require("../services/diagnosisService"));
+const router = express_1.default.Router();
+router.get('/', (_req, res) => {
+    res.send(diagnosisService_1.default.getDiagnoses());
 });
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+exports.default = router;
