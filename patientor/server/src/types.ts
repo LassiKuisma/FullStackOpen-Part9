@@ -4,7 +4,11 @@ export interface Diagnosis {
   latin?: string;
 }
 
-export type Gender = 'male' | 'female' | 'other';
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+  other = 'other',
+}
 
 export interface PatientPrivateInfo {
   id: string;
@@ -16,3 +20,5 @@ export interface PatientPrivateInfo {
 }
 
 export type PatientInfo = Omit<PatientPrivateInfo, 'ssn'>;
+
+export type NewPatientEntry = Omit<PatientPrivateInfo, 'id'>;
