@@ -3,6 +3,7 @@ import {
   CoursePartBackground,
   CoursePartBasic,
   CoursePartGroup,
+  CoursePartSpecial,
 } from '../App';
 
 const BasicCourse = (course: CoursePartBasic) => (
@@ -23,6 +24,10 @@ const GroupCourse = (course: CoursePartGroup) => (
   <div>Project exercises: {course.groupProjectCount} </div>
 );
 
+const SpecialCourse = (course: CoursePartSpecial) => (
+  <div>Required skills: {course.requirements.join(',')}</div>
+);
+
 const CourseDetails = (course: CoursePart) => {
   switch (course.kind) {
     case 'basic':
@@ -31,6 +36,8 @@ const CourseDetails = (course: CoursePart) => {
       return BackgroundCourse(course);
     case 'group':
       return GroupCourse(course);
+    case 'special':
+      return SpecialCourse(course);
     default:
       return assertNever(course);
   }
