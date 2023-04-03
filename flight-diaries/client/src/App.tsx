@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import FlightDiaries from './components/FlightDiaries';
-import { getAllDiaries } from './services/diaryService';
-import { FlightDiary } from './types';
+import CreateNewDiary from './components/CreateNewDiary';
+import { createFlightDiary, getAllDiaries } from './services/diaryService';
+import { FlightDiary, NewFlightDiary } from './types';
 
 const App = () => {
   const [diaries, setDiaries] = useState<FlightDiary[]>([]);
@@ -10,8 +11,16 @@ const App = () => {
     getAllDiaries().then((diaries) => setDiaries(diaries));
   }, []);
 
+  const addNewDiary = (diary: NewFlightDiary) => {
+    createFlightDiary(diary).then((created) => {
+      setDiaries(diaries.concat(created));
+    });
+  };
+
   return (
     <div>
+      <h2>Add new entry</h2>
+      <CreateNewDiary addNewDiary={addNewDiary} />
       <h2>Diary entries</h2>
       <FlightDiaries flightDiaries={diaries} />
     </div>
