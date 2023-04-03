@@ -7,3 +7,8 @@ export interface FlightDiary {
 }
 
 export type NewFlightDiary = Omit<FlightDiary, 'id'>;
+
+export type Err = { k: 'error'; message: string };
+export type Ok<T> = { k: 'ok'; value: T };
+
+export type Result<T> = Ok<T> | Err;
