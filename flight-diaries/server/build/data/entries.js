@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const diaryEntries = [
+const utils_1 = __importDefault(require("../src/utils"));
+const data = [
     {
         id: 1,
         date: '2017-01-01',
@@ -30,4 +34,9 @@ const diaryEntries = [
         comment: 'I almost failed the landing but I survived',
     },
 ];
+const diaryEntries = data.map((obj) => {
+    const object = (0, utils_1.default)(obj);
+    object.id = obj.id;
+    return object;
+});
 exports.default = diaryEntries;
