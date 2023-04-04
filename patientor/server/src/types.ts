@@ -17,8 +17,12 @@ export interface PatientPrivateInfo {
   ssn: string;
   gender: Gender;
   occupation: string;
+  entires: Entry[];
 }
 
-export type PatientInfo = Omit<PatientPrivateInfo, 'ssn'>;
+export type PatientInfo = Omit<PatientPrivateInfo, 'ssn' | 'entries'>;
 
 export type NewPatientEntry = Omit<PatientPrivateInfo, 'id'>;
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Entry {}
