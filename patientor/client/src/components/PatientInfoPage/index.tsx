@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 
-import { Entry, Gender, Patient } from '../../types';
+import { Diagnosis, Entry, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 
 interface Props {
   id: string | undefined;
+  diagnoses: Map<string, Diagnosis>;
 }
 
 const genderIcon = (gender: Gender) => {
@@ -21,12 +22,23 @@ const genderIcon = (gender: Gender) => {
   }
 };
 
-const EntryDetails = ({ entry }: { entry: Entry }) => {
+const EntryDetails = ({
+  entry,
+  diagnoses,
+}: {
+  entry: Entry;
+  diagnoses: Map<string, Diagnosis>;
+}) => {
   const codes = (
     <ul>
-      {entry.diagnosisCodes?.map((code) => (
-        <li key={code}>{code}</li>
-      ))}
+      {entry.diagnosisCodes?.map((code) => {
+        const name = diagnoses.get(code)?.name || 'unknown';
+        return (
+          <li key={code}>
+            {code} {name}
+          </li>
+        );
+      })}
     </ul>
   );
 
@@ -38,18 +50,24 @@ const EntryDetails = ({ entry }: { entry: Entry }) => {
   );
 };
 
-const Entries = ({ entries }: { entries: Entry[] }) => {
+const Entries = ({
+  entries,
+  diagnoses,
+}: {
+  entries: Entry[];
+  diagnoses: Map<string, Diagnosis>;
+}) => {
   return (
     <div>
       <h3>Entries</h3>
       {entries.map((entry) => (
-        <EntryDetails key={entry.id} entry={entry} />
+        <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
       ))}
     </div>
   );
 };
 
-const PatientInfoPage = ({ id }: Props) => {
+const PatientInfoPage = ({ id, diagnoses }: Props) => {
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [error, setError] = useState('');
 
@@ -86,7 +104,7 @@ const PatientInfoPage = ({ id }: Props) => {
         <br />
         occupation: {patient.occupation}
       </div>
-      <Entries entries={patient.entries} />
+      <Entries entries={patient.entries} diagnoses={diagnoses} />
     </div>
   );
 };
