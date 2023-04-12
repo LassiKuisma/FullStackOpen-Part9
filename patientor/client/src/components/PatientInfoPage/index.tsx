@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 
-import { Gender, Patient } from '../../types';
+import { Entry, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 
 interface Props {
@@ -19,6 +19,34 @@ const genderIcon = (gender: Gender) => {
     default:
       return <></>;
   }
+};
+
+const EntryDetails = ({ entry }: { entry: Entry }) => {
+  const codes = (
+    <ul>
+      {entry.diagnosisCodes?.map((code) => (
+        <li key={code}>{code}</li>
+      ))}
+    </ul>
+  );
+
+  return (
+    <div>
+      {entry.date} <i>{entry.description}</i>
+      {codes}
+    </div>
+  );
+};
+
+const Entries = ({ entries }: { entries: Entry[] }) => {
+  return (
+    <div>
+      <h3>Entries</h3>
+      {entries.map((entry) => (
+        <EntryDetails key={entry.id} entry={entry} />
+      ))}
+    </div>
+  );
 };
 
 const PatientInfoPage = ({ id }: Props) => {
@@ -53,9 +81,12 @@ const PatientInfoPage = ({ id }: Props) => {
       <h2>
         {patient.name} {genderIcon(patient.gender)}
       </h2>
-      ssn: {patient.ssn || 'unknown'}
-      <br />
-      occupation: {patient.occupation}
+      <div>
+        ssn: {patient.ssn || 'unknown'}
+        <br />
+        occupation: {patient.occupation}
+      </div>
+      <Entries entries={patient.entries} />
     </div>
   );
 };
