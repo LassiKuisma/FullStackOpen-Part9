@@ -22,7 +22,7 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
       ssn: parseSsn(object.ssn),
       gender: parseGender(object.gender),
       occupation: parseOccupation(object.occupation),
-      entires: [],
+      entries: [],
     };
   } catch (error: unknown) {
     // I prefer to return errors instead of throwing them, as  that way they

@@ -17,7 +17,7 @@ export interface PatientPrivateInfo {
   ssn: string;
   gender: Gender;
   occupation: string;
-  entires: Entry[];
+  entries: Entry[];
 }
 
 export type PatientInfo = Omit<PatientPrivateInfo, 'ssn' | 'entries'>;
