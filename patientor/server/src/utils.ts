@@ -1,4 +1,4 @@
-import { Gender, NewPatientEntry } from './types';
+import { Entry, Gender, NewPatientEntry } from './types';
 
 const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
   if (!object || typeof object !== 'object') {
@@ -15,6 +15,11 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
     return new Error('Incorrect data: field(s) missing');
   }
 
+  let entries = undefined;
+  if ('entries' in object) {
+    entries = object.entries;
+  }
+
   try {
     return {
       name: parseName(object.name),
@@ -22,7 +27,7 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
       ssn: parseSsn(object.ssn),
       gender: parseGender(object.gender),
       occupation: parseOccupation(object.occupation),
-      entries: [],
+      entries: parseEntries(entries),
     };
   } catch (error: unknown) {
     // I prefer to return errors instead of throwing them, as  that way they
@@ -67,6 +72,22 @@ const parseOccupation = (occupation: unknown): string => {
     throw new Error('Incorrect or missing occupation');
   }
   return occupation;
+};
+
+const parseEntries = (entries: unknown): Array<Entry> => {
+  if (!entries || !(entries instanceof Array)) {
+    return new Array<Entry>();
+  }
+
+  const parsed = entries.map((entry) => {
+    if (!('type' in entry)) {
+      throw new Error('Entry is missing type.');
+    }
+
+    return entry as Entry;
+  });
+
+  return parsed;
 };
 
 const isDate = (date: string): boolean => {
