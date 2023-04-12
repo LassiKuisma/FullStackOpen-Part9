@@ -11,6 +11,8 @@ import diagnosisService from './services/diagnosis';
 import PatientListPage from './components/PatientListPage';
 import PatientInfoPage from './components/PatientInfoPage';
 
+import './App.css';
+
 const App = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [diagnoses, setDiagnoses] = useState<Map<string, Diagnosis>>(new Map());

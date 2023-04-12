@@ -43,8 +43,10 @@ const EntryDetails = ({
   );
 
   return (
-    <div>
-      {entry.date} <i>{entry.description}</i>
+    <div className="entryBox">
+      {entry.date}
+      <br />
+      <i>{entry.description}</i>
       {codes}
     </div>
   );
