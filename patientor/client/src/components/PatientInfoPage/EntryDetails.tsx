@@ -15,14 +15,19 @@ import {
 
 import { assertNever } from '../../util';
 
-const HospitalEntryDetails = ({ entry }: { entry: HospitalEntry }) => {
+const HospitalEntryDetails = ({
+  entry,
+  diagnoses,
+}: {
+  entry: HospitalEntry;
+  diagnoses: Map<string, Diagnosis>;
+}) => {
   return (
     <div className="entryBox">
       {entry.date} <HealingIcon />
       <br />
       <i>{entry.description}</i>
-      <div>Hospital</div>
-      <br />
+      <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
       Diagnose by {entry.specialist}
     </div>
   );
@@ -30,8 +35,10 @@ const HospitalEntryDetails = ({ entry }: { entry: HospitalEntry }) => {
 
 const OccupationalEntryDetails = ({
   entry,
+  diagnoses,
 }: {
   entry: OccupationalHealthcareEntry;
+  diagnoses: Map<string, Diagnosis>;
 }) => {
   return (
     <div className="entryBox">
@@ -39,6 +46,7 @@ const OccupationalEntryDetails = ({
       <br />
       <i>{entry.description}</i>
       <br />
+      <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
       Diagnose by {entry.specialist}
     </div>
   );
@@ -59,7 +67,13 @@ const HealthRatingIcon = ({ rating }: { rating: HealthCheckRating }) => {
   }
 };
 
-const HealthCheckDetails = ({ entry }: { entry: HealthCheckEntry }) => {
+const HealthCheckDetails = ({
+  entry,
+  diagnoses,
+}: {
+  entry: HealthCheckEntry;
+  diagnoses: Map<string, Diagnosis>;
+}) => {
   return (
     <div className="entryBox">
       {entry.date} <MedicalServicesIcon />
@@ -68,8 +82,34 @@ const HealthCheckDetails = ({ entry }: { entry: HealthCheckEntry }) => {
       <br />
       <HealthRatingIcon rating={entry.healthCheckRating} />
       <br />
+      <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
       Diagnose by {entry.specialist}
     </div>
+  );
+};
+
+const DiagnosisCodes = ({
+  entry,
+  diagnoses,
+}: {
+  entry: Entry;
+  diagnoses: Map<string, Diagnosis>;
+}) => {
+  if (!entry.diagnosisCodes) {
+    return <></>;
+  }
+
+  return (
+    <ul>
+      {entry.diagnosisCodes.map((code) => {
+        const name = diagnoses.get(code)?.name || 'unknown';
+        return (
+          <li key={code}>
+            {code} {name}
+          </li>
+        );
+      })}
+    </ul>
   );
 };
 
@@ -82,36 +122,14 @@ const EntryDetails = ({
 }) => {
   switch (entry.type) {
     case 'Hospital':
-      return <HospitalEntryDetails entry={entry} />;
+      return <HospitalEntryDetails entry={entry} diagnoses={diagnoses} />;
     case 'OccupationalHealthcare':
-      return <OccupationalEntryDetails entry={entry} />;
+      return <OccupationalEntryDetails entry={entry} diagnoses={diagnoses} />;
     case 'HealthCheck':
-      return <HealthCheckDetails entry={entry} />;
+      return <HealthCheckDetails entry={entry} diagnoses={diagnoses} />;
     default:
       return assertNever(entry);
   }
-
-  /*const codes = (
-    <ul>
-      {entry.diagnosisCodes?.map((code) => {
-        const name = diagnoses.get(code)?.name || 'unknown';
-        return (
-          <li key={code}>
-            {code} {name}
-          </li>
-        );
-      })}
-    </ul>
-  );
-
-  return (
-    <div className="entryBox">
-      {entry.date}
-      <br />
-      <i>{entry.description}</i>
-      {codes}
-    </div>
-  );*/
 };
 
 export default EntryDetails;
