@@ -1,4 +1,4 @@
-import { Entry, Gender, NewPatientEntry } from './types';
+import { Entry, Gender, NewPatientEntry } from '../types';
 
 const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
   if (!object || typeof object !== 'object') {
