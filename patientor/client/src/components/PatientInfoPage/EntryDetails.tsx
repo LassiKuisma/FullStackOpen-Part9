@@ -28,7 +28,10 @@ const HospitalEntryDetails = ({
       <br />
       <i>{entry.description}</i>
       <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
-      Diagnose by {entry.specialist}
+      <div>Diagnose by {entry.specialist}</div>
+      <div>
+        Discharged {entry.discharge.date}: {entry.discharge.criteria}
+      </div>
     </div>
   );
 };
@@ -40,6 +43,15 @@ const OccupationalEntryDetails = ({
   entry: OccupationalHealthcareEntry;
   diagnoses: Map<string, Diagnosis>;
 }) => {
+  const sickLeave = entry.sickLeave ? (
+    <div>
+      On sick leave from {entry.sickLeave.startDate} to{' '}
+      {entry.sickLeave.endDate}
+    </div>
+  ) : (
+    <></>
+  );
+
   return (
     <div className="entryBox">
       {entry.date} <WorkIcon /> {entry.employerName}
@@ -47,7 +59,8 @@ const OccupationalEntryDetails = ({
       <i>{entry.description}</i>
       <br />
       <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
-      Diagnose by {entry.specialist}
+      <div>Diagnose by {entry.specialist}</div>
+      {sickLeave}
     </div>
   );
 };
@@ -83,7 +96,7 @@ const HealthCheckDetails = ({
       <HealthRatingIcon rating={entry.healthCheckRating} />
       <br />
       <DiagnosisCodes entry={entry} diagnoses={diagnoses} />
-      Diagnose by {entry.specialist}
+      <div>Diagnose by {entry.specialist}</div>
     </div>
   );
 };
