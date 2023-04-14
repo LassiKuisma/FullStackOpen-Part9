@@ -1,12 +1,14 @@
 import {
   BaseEntry,
   Diagnosis,
+  Discharge,
   EntryWithoutId,
   HealthCheckEntry,
   HealthCheckRating,
   HospitalEntry,
   OccupationalHealthcareEntry,
   Result,
+  SickLeave,
 } from '../types';
 import { error, isDate, isNumber, isString, ok } from './utils';
 
@@ -17,7 +19,7 @@ const toNewEntry = (object: unknown): Result<EntryWithoutId> => {
     return error('Incorrect or missing data');
   }
 
-  if (!('type' in object)) return error('missing field: type');
+  if (!('type' in object)) return error('Missing field: type');
   if (!isString(object.type)) {
     return error('Field is not a string: type.');
   }
@@ -113,13 +115,105 @@ const parseHealthCheckRating = (object: object): Result<HealthCheckRating> => {
 };
 
 const parseOccupationalEntry = (
-  _object: object
-): Result<OccupationalHealthcareEntry> => {
-  return error('todo');
+  object: object
+): Result<Omit<OccupationalHealthcareEntry, 'id'>> => {
+  const parseResult = parseFields(object);
+  if (parseResult.k === 'error') {
+    return parseResult;
+  }
+
+  if (!('employerName' in object)) {
+    return error('Missing field: employerName');
+  }
+
+  if (!isString(object.employerName)) {
+    return error('Field is not a string: employerName');
+  }
+
+  let sickLeave = undefined;
+  if ('sickLeave' in object) {
+    const sickLeaveParsed = parseSickLeave(object.sickLeave);
+    if (sickLeaveParsed.k === 'error') {
+      return sickLeaveParsed;
+    }
+    sickLeave = sickLeaveParsed.value;
+  }
+
+  const baseEntry = parseResult.value;
+  return ok({
+    type: 'OccupationalHealthcare',
+    employerName: object.employerName,
+    sickLeave,
+    ...baseEntry,
+  });
 };
 
-const parseHospitalEntry = (_object: object): Result<HospitalEntry> => {
-  return error('todo');
+const parseSickLeave = (object: unknown): Result<SickLeave> => {
+  if (!object || typeof object !== 'object') {
+    return error('Incorrect or missing data: sickLeave');
+  }
+
+  if (!('startDate' in object)) return error('Missing field: startDate');
+  if (!('endDate' in object)) return error('Missing field: endDate');
+
+  if (!isString(object.startDate) || !isDate(object.startDate)) {
+    return error('Invalid date: startDate');
+  }
+
+  if (!isString(object.endDate) || !isDate(object.endDate)) {
+    return error('Invalid date: endDate');
+  }
+
+  return ok({
+    startDate: object.startDate,
+    endDate: object.endDate,
+  });
+};
+
+const parseHospitalEntry = (
+  object: object
+): Result<Omit<HospitalEntry, 'id'>> => {
+  const parseResult = parseFields(object);
+  if (parseResult.k === 'error') {
+    return parseResult;
+  }
+
+  if (!('discharge' in object)) {
+    return error('Missing field: discharge');
+  }
+
+  const discharge = parseDischarge(object.discharge);
+  if (discharge.k === 'error') {
+    return discharge;
+  }
+
+  const baseEntry = parseResult.value;
+  return ok({
+    type: 'Hospital',
+    discharge: discharge.value,
+    ...baseEntry,
+  });
+};
+
+const parseDischarge = (object: unknown): Result<Discharge> => {
+  if (!object || typeof object !== 'object') {
+    return error('Incorrect or missing data: discharge');
+  }
+
+  if (!('date' in object)) return error('Missing field: discharge date');
+  if (!('criteria' in object)) return error('Missing field: criteria');
+
+  if (!isString(object.date) || !isDate(object.date)) {
+    return error('Invalid date');
+  }
+  if (!isString(object.criteria)) {
+    return error('Field is not a string: criteria');
+  }
+
+  return ok({
+    date: object.date,
+    criteria: object.criteria,
+  });
 };
 
 export default toNewEntry;

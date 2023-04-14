@@ -1,0 +1,14 @@
+POST http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+    "type": "OccupationalHealthcare",
+    "date": "2017-05-24",
+    "description": "Test entry (occupational)",
+    "specialist": "Dr Who",
+    "employerName": "Black Mesa",
+    "sickLeave": {
+        "startDate": "2017-05-25",
+        "endDate": "2018-02-01"
+    }
+}

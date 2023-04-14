@@ -4,7 +4,7 @@ Content-Type: application/json
 {
     "type": "HealthCheck",
     "date": "2023-01-02",
-    "description": "Test entry",
+    "description": "Test entry (health check)",
     "specialist": "Dr Who",
     "healthCheckRating": 2
 }
