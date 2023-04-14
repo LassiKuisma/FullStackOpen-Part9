@@ -1,4 +1,5 @@
 import { Entry, Gender, NewPatientEntry } from '../types';
+import { isDate, isString } from './utils';
 
 const toNewPatientEntry = (object: unknown): NewPatientEntry | Error => {
   if (!object || typeof object !== 'object') {
@@ -90,18 +91,10 @@ const parseEntries = (entries: unknown): Array<Entry> => {
   return parsed;
 };
 
-const isDate = (date: string): boolean => {
-  return Boolean(Date.parse(date));
-};
-
 const isGender = (param: string): param is Gender => {
   return Object.values(Gender)
     .map((g) => g.toString())
     .includes(param);
-};
-
-const isString = (text: unknown): text is string => {
-  return typeof text === 'string' || text instanceof String;
 };
 
 export default toNewPatientEntry;

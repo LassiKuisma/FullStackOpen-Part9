@@ -2,19 +2,19 @@ import {
   BaseEntry,
   Diagnosis,
   EntryWithoutId,
-  Err,
   HealthCheckEntry,
   HealthCheckRating,
   HospitalEntry,
   OccupationalHealthcareEntry,
   Result,
 } from '../types';
+import { error, isDate, isNumber, isString, ok } from './utils';
 
 type BaseEntryWithoutId = Omit<BaseEntry, 'id'>;
 
 const toNewEntry = (object: unknown): Result<EntryWithoutId> => {
   if (!object || typeof object !== 'object') {
-    return { k: 'error', message: 'Incorrect or missing data' };
+    return error('Incorrect or missing data');
   }
 
   if (!('type' in object)) return error('missing field: type');
@@ -51,15 +51,12 @@ const parseFields = (object: object): Result<BaseEntryWithoutId> => {
 
   const diagnosisCodes = parseDiagnosisCodes(object);
 
-  return {
-    k: 'ok',
-    value: {
-      date: object.date,
-      description: object.description,
-      specialist: object.specialist,
-      diagnosisCodes,
-    },
-  };
+  return ok({
+    date: object.date,
+    description: object.description,
+    specialist: object.specialist,
+    diagnosisCodes,
+  });
 };
 
 const parseDiagnosisCodes = (object: object): Array<Diagnosis['code']> => {
@@ -86,14 +83,11 @@ const parseHealthCheckEntry = (
 
   const baseEntry = parseResult.value;
 
-  return {
-    k: 'ok',
-    value: {
-      type: 'HealthCheck',
-      healthCheckRating: hcr.value,
-      ...baseEntry,
-    },
-  };
+  return ok({
+    type: 'HealthCheck',
+    healthCheckRating: hcr.value,
+    ...baseEntry,
+  });
 };
 
 const isHealthCheckRating = (
@@ -115,10 +109,7 @@ const parseHealthCheckRating = (object: object): Result<HealthCheckRating> => {
     return error('Invalid field: healthCheckRating');
   }
 
-  return {
-    k: 'ok',
-    value: hcr,
-  };
+  return ok(hcr);
 };
 
 const parseOccupationalEntry = (
@@ -129,22 +120,6 @@ const parseOccupationalEntry = (
 
 const parseHospitalEntry = (_object: object): Result<HospitalEntry> => {
   return error('todo');
-};
-
-const error = (message: string): Err => {
-  return { k: 'error', message };
-};
-
-const isNumber = (param: unknown): param is number => {
-  return typeof param === 'number' || param instanceof Number;
-};
-
-const isString = (text: unknown): text is string => {
-  return typeof text === 'string' || text instanceof String;
-};
-
-const isDate = (date: string): boolean => {
-  return Boolean(Date.parse(date));
 };
 
 export default toNewEntry;
