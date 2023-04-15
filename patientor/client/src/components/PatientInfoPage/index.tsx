@@ -6,6 +6,7 @@ import FemaleIcon from '@mui/icons-material/Female';
 import { Diagnosis, Entry, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 import EntryDetails from './EntryDetails';
+import NewEntryForm from './NewEntryForm';
 
 interface Props {
   id: string | undefined;
@@ -77,6 +78,7 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         <br />
         occupation: {patient.occupation}
       </div>
+      <NewEntryForm />
       <Entries entries={patient.entries} diagnoses={diagnoses} />
     </div>
   );

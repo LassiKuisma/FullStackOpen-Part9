@@ -5,3 +5,10 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+.newEntryBox {
+  border: 3px dotted;
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
