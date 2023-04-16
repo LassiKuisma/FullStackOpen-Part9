@@ -20,27 +20,21 @@ export const ok = <T>(value: T): Ok<T> => {
   return { k: 'ok', value };
 };
 
-const isNumber = (param: unknown): param is number => {
-  return typeof param === 'number' || param instanceof Number;
-};
-
-const isString = (text: unknown): text is string => {
-  return typeof text === 'string' || text instanceof String;
-};
-
-const isHealthCheckRating = (
-  param: string | number
-): param is HealthCheckRating => {
+const isHealthCheckRating = (param: number): param is HealthCheckRating => {
   return Object.values(HealthCheckRating).includes(param);
 };
 
-export const parseHealthCheckRating = (
-  rating: unknown
+export const stringToHealthCheckRating = (
+  rating: string
 ): Result<HealthCheckRating> => {
-  const isStrOrNum = isString(rating) || isNumber(rating);
-  if (!isStrOrNum || !isHealthCheckRating(rating)) {
-    return error('Not a number or string');
+  const asNumber = Number.parseInt(rating);
+  if (Number.isNaN(asNumber)) {
+    return error(`'${rating}' is not a valid number`);
   }
 
-  return ok(rating);
+  if (isHealthCheckRating(asNumber)) {
+    return ok(asNumber);
+  }
+
+  return error(`'${asNumber}' is not a valid HealthCheckRating`);
 };

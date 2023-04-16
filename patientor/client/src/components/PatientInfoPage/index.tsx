@@ -88,13 +88,15 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
     console.log('error:', message);
   };
 
-  const submitNewEntry = async (entry: EntryWithoutId) => {
+  const submitNewEntry = async (entry: EntryWithoutId): Promise<boolean> => {
     try {
       const created = await patientService.addEntry(patient, entry);
       setPatient({
         ...patient,
         entries: patient.entries.concat(created),
       });
+
+      return true;
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const response = error?.response?.data;
@@ -107,6 +109,8 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
       } else {
         showError('Unknown error');
       }
+
+      return false;
     }
   };
 
@@ -132,6 +136,7 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         showWhenVisible={showWhenVisible}
         closeEntryForm={closeEntryForm}
         submitNewEntry={submitNewEntry}
+        showError={showError}
       />
       <Entries entries={patient.entries} diagnoses={diagnoses} />
     </div>

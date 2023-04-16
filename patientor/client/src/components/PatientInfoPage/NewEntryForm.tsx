@@ -1,18 +1,20 @@
 import { Button, Grid, TextField } from '@mui/material';
 import React, { SyntheticEvent, useState } from 'react';
 import { EntryWithoutId } from '../../types';
-import { parseHealthCheckRating } from '../../util';
+import { stringToHealthCheckRating } from '../../util';
 
 interface Props {
   showWhenVisible: React.CSSProperties;
   closeEntryForm: () => void;
-  submitNewEntry: (entry: EntryWithoutId) => void;
+  submitNewEntry: (entry: EntryWithoutId) => Promise<boolean>;
+  showError: (message: string) => void;
 }
 
 const NewEntryForm = ({
   showWhenVisible,
   closeEntryForm,
   submitNewEntry,
+  showError,
 }: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -28,17 +30,12 @@ const NewEntryForm = ({
     setCodes('');
   };
 
-  const showError = (message: string) => {
-    // TODO: take proper callback in props
-    console.log('error:', message);
-  };
-
-  const handleSubmit = (event: SyntheticEvent) => {
+  const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
 
-    const rating = parseHealthCheckRating(healthRating);
+    const rating = stringToHealthCheckRating(healthRating);
     if (rating.k === 'error') {
-      showError(`error parsing health rating: ${rating.message}`);
+      showError(rating.message);
       return;
     }
 
@@ -53,8 +50,11 @@ const NewEntryForm = ({
       healthCheckRating: rating.value,
     };
 
-    submitNewEntry(newEntry);
-    // TODO: make this return ok/fail
+    const success = await submitNewEntry(newEntry);
+    if (!success) {
+      // error message should be set in callback
+      return;
+    }
 
     closeEntryForm();
     resetTextFields();
