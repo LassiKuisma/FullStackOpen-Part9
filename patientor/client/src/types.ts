@@ -1,3 +1,8 @@
+export type Err = { k: 'error'; message: string };
+export type Ok<T> = { k: 'ok'; value: T };
+
+export type Result<T> = Ok<T> | Err;
+
 export interface Diagnosis {
   code: string;
   name: string;
