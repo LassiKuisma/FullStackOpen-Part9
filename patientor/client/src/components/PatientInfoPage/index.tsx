@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
+import { Button } from '@mui/material';
 
-import { Diagnosis, Entry, Gender, Patient } from '../../types';
+import { Diagnosis, Entry, EntryWithoutId, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 import EntryDetails from './EntryDetails';
 import NewEntryForm from './NewEntryForm';
+
+import axios from 'axios';
 
 interface Props {
   id: string | undefined;
@@ -44,6 +47,7 @@ const Entries = ({
 const PatientInfoPage = ({ id, diagnoses }: Props) => {
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [error, setError] = useState('');
+  const [entryFormVisible, setEntryFormVisible] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -68,6 +72,44 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
     return <div>Loading...</div>;
   }
 
+  const hideWhenVisible = { display: entryFormVisible ? 'none' : '' };
+  const showWhenVisible = { display: entryFormVisible ? '' : 'none' };
+
+  const openEntryForm = () => {
+    setEntryFormVisible(true);
+  };
+
+  const closeEntryForm = () => {
+    setEntryFormVisible(false);
+  };
+
+  const showError = (message: string) => {
+    // TODO: make this a proper component, pass it to NewEntryForm
+    console.log('error:', message);
+  };
+
+  const submitNewEntry = async (entry: EntryWithoutId) => {
+    try {
+      const created = await patientService.addEntry(patient, entry);
+      setPatient({
+        ...patient,
+        entries: patient.entries.concat(created),
+      });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const response = error?.response?.data;
+        if (response && typeof response === 'string') {
+          const message = response.replace('Something went wrong. Error: ', '');
+          showError(`error adding entry: ${message}`);
+        } else {
+          showError('Unrecognized axios error');
+        }
+      } else {
+        showError('Unknown error');
+      }
+    }
+  };
+
   return (
     <div>
       <h2>
@@ -78,7 +120,19 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         <br />
         occupation: {patient.occupation}
       </div>
-      <NewEntryForm />
+      <br />
+      <Button
+        variant="contained"
+        onClick={openEntryForm}
+        style={hideWhenVisible}
+      >
+        Add new entry
+      </Button>
+      <NewEntryForm
+        showWhenVisible={showWhenVisible}
+        closeEntryForm={closeEntryForm}
+        submitNewEntry={submitNewEntry}
+      />
       <Entries entries={patient.entries} diagnoses={diagnoses} />
     </div>
   );

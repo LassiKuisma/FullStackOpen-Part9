@@ -1,22 +1,68 @@
 import { Button, Grid, TextField } from '@mui/material';
 import React, { SyntheticEvent, useState } from 'react';
+import { EntryWithoutId } from '../../types';
+import { parseHealthCheckRating } from '../../util';
 
-const NewEntryForm = () => {
+interface Props {
+  showWhenVisible: React.CSSProperties;
+  closeEntryForm: () => void;
+  submitNewEntry: (entry: EntryWithoutId) => void;
+}
+
+const NewEntryForm = ({
+  showWhenVisible,
+  closeEntryForm,
+  submitNewEntry,
+}: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
   const [healthRating, setHealthRating] = useState('');
   const [codes, setCodes] = useState('');
 
+  const resetTextFields = () => {
+    setDescription('');
+    setDate('');
+    setSpecialist('');
+    setHealthRating('');
+    setCodes('');
+  };
+
+  const showError = (message: string) => {
+    // TODO: take proper callback in props
+    console.log('error:', message);
+  };
+
   const handleSubmit = (event: SyntheticEvent) => {
     event.preventDefault();
-    // TODO:
-    console.log('submitting form...');
+
+    const rating = parseHealthCheckRating(healthRating);
+    if (rating.k === 'error') {
+      showError(`error parsing health rating: ${rating.message}`);
+      return;
+    }
+
+    const codesSplit = codes.split(',').map((code) => code.trim());
+
+    const newEntry: EntryWithoutId = {
+      type: 'HealthCheck',
+      description,
+      date,
+      specialist,
+      diagnosisCodes: codesSplit,
+      healthCheckRating: rating.value,
+    };
+
+    submitNewEntry(newEntry);
+    // TODO: make this return ok/fail
+
+    closeEntryForm();
+    resetTextFields();
   };
 
   const onCancel = () => {
-    // TODO:
-    console.log('cancel');
+    closeEntryForm();
+    resetTextFields();
   };
 
   const buttonStyle: React.CSSProperties = {
@@ -29,7 +75,7 @@ const NewEntryForm = () => {
   };
 
   return (
-    <div className="newEntryBox">
+    <div className="newEntryBox" style={showWhenVisible}>
       <h3>New HealthCheck entry</h3>
       <form onSubmit={handleSubmit}>
         <TextField
