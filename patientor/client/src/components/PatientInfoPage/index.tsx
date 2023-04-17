@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
-import { Button } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 
 import { Diagnosis, Entry, EntryWithoutId, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
@@ -47,6 +47,12 @@ const Entries = ({
 const PatientInfoPage = ({ id, diagnoses }: Props) => {
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [error, setError] = useState('');
+  const [entrySubmitError, setEntrySubmitError] = useState<string | undefined>(
+    undefined
+  );
+  const [errorTimer, setErrorTimer] = useState<NodeJS.Timeout | undefined>(
+    undefined
+  );
   const [entryFormVisible, setEntryFormVisible] = useState(false);
 
   useEffect(() => {
@@ -84,8 +90,17 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
   };
 
   const showError = (message: string) => {
-    // TODO: make this a proper component, pass it to NewEntryForm
-    console.log('error:', message);
+    setEntrySubmitError(message);
+
+    if (errorTimer) {
+      clearTimeout(errorTimer);
+    }
+
+    const timer = setTimeout(() => {
+      setEntrySubmitError(undefined);
+    }, 5000);
+
+    setErrorTimer(timer);
   };
 
   const submitNewEntry = async (entry: EntryWithoutId): Promise<boolean> => {
@@ -102,12 +117,12 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         const response = error?.response?.data;
         if (response && typeof response === 'string') {
           const message = response.replace('Something went wrong. Error: ', '');
-          showError(`error adding entry: ${message}`);
+          showError(`Error adding entry: ${message}`);
         } else {
-          showError('Unrecognized axios error');
+          showError('Failed to add new entry: unrecognized axios error');
         }
       } else {
-        showError('Unknown error');
+        showError('Failed to add new entry: unknown error');
       }
 
       return false;
@@ -125,6 +140,7 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         occupation: {patient.occupation}
       </div>
       <br />
+      {entrySubmitError && <Alert severity="error">{entrySubmitError}</Alert>}
       <Button
         variant="contained"
         onClick={openEntryForm}

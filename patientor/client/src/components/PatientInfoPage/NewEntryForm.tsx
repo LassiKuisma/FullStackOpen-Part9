@@ -35,7 +35,7 @@ const NewEntryForm = ({
 
     const rating = stringToHealthCheckRating(healthRating);
     if (rating.k === 'error') {
-      showError(rating.message);
+      showError(`Invalid health check rating: ${rating.message}`);
       return;
     }
 
