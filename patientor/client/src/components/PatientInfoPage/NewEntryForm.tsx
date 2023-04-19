@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Box, Button, Grid, Tab, Tabs, TextField } from '@mui/material';
 import React, { SyntheticEvent, useState } from 'react';
 import { EntryWithoutId } from '../../types';
 import { stringToHealthCheckRating } from '../../util';
@@ -103,20 +103,26 @@ const NewEntryForm = ({
           style={inputStyle}
         />
         <TextField
-          label="Healthcheck rating"
-          variant="standard"
-          fullWidth
-          value={healthRating}
-          onChange={({ target }) => setHealthRating(target.value)}
-          style={inputStyle}
-        />
-        <TextField
           label="Diagnosis codes"
           variant="standard"
           fullWidth
           value={codes}
           onChange={({ target }) => setCodes(target.value)}
           style={inputStyle}
+        />
+        <EntryTabs
+          healthCheck={
+            <TextField
+              label="Healthcheck rating"
+              variant="standard"
+              fullWidth
+              value={healthRating}
+              onChange={({ target }) => setHealthRating(target.value)}
+              style={inputStyle}
+            />
+          }
+          occupational={<div>second tab</div>}
+          hospital={<div>third tab</div>}
         />
         <Grid container justifyContent={'space-between'}>
           <Grid item>
@@ -142,6 +148,64 @@ const NewEntryForm = ({
           </Grid>
         </Grid>
       </form>
+    </div>
+  );
+};
+
+interface EntryTabsProps {
+  healthCheck: React.ReactNode;
+  occupational: React.ReactNode;
+  hospital: React.ReactNode;
+}
+
+const EntryTabs = ({ healthCheck, occupational, hospital }: EntryTabsProps) => {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="entry type selection tabs"
+        >
+          <Tab label="Health check" />
+          <Tab label="Occupational" />
+          <Tab label="Hospital entry" />
+        </Tabs>
+      </Box>
+      <TabPanel value={value} index={0}>
+        {healthCheck}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        {occupational}
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        {hospital}
+      </TabPanel>
+    </Box>
+  );
+};
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = ({ children, value, index }: TabPanelProps) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+    >
+      {children}
     </div>
   );
 };
