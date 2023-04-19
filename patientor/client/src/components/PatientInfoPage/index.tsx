@@ -7,7 +7,7 @@ import { Alert, Button } from '@mui/material';
 import { Diagnosis, Entry, EntryWithoutId, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 import EntryDetails from './EntryDetails';
-import NewEntryForm from './NewEntryForm';
+import NewEntryForm from '../PatientEntries/NewEntryForm';
 
 import axios from 'axios';
 
