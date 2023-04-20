@@ -1,15 +1,10 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Grid,
-  Tab,
-  Tabs,
-  TextField,
-} from '@mui/material';
+import { Box, Button, Grid, Tab, Tabs, TextField } from '@mui/material';
 import React, { SyntheticEvent, useState } from 'react';
 import { Entry, EntryWithoutId } from '../../types';
 import { assertNever, stringToHealthCheckRating } from '../../util';
+import HealthCheckTab from './EntryVariants/HealthCheck';
+import OccupationalEntryTab from './EntryVariants/OccupationalEntry';
+import HospitalEntryTab from './EntryVariants/HospitalEntry';
 
 interface Props {
   showWhenVisible: React.CSSProperties;
@@ -50,93 +45,47 @@ const NewEntryForm = ({
 
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const healthCheck = (
-    <div>
-      <TextField
-        label="Healthcheck rating"
-        variant="standard"
-        fullWidth
-        value={healthRating}
-        onChange={({ target }) => setHealthRating(target.value)}
-        style={inputStyle}
-      />
-    </div>
-  );
-
-  const occupational = (
-    <div>
-      <TextField
-        label="Employer"
-        variant="standard"
-        fullWidth
-        value={employerName}
-        onChange={({ target }) => setEmployerName(target.value)}
-        style={inputStyle}
-      />
-      <div>
-        Sick leave?
-        <Checkbox
-          value={sickLeaveEnabled}
-          onChange={() => setSickLeaveEnabled(!sickLeaveEnabled)}
-        />
-      </div>
-      <TextField
-        label="Start"
-        variant="standard"
-        fullWidth
-        value={sickLeaveStart}
-        onChange={({ target }) => setSickLeaveStart(target.value)}
-        style={inputStyle}
-        disabled={!sickLeaveEnabled}
-      />
-      <TextField
-        label="End"
-        variant="standard"
-        fullWidth
-        value={sickLeaveEnd}
-        onChange={({ target }) => setSickLeaveEnd(target.value)}
-        style={inputStyle}
-        disabled={!sickLeaveEnabled}
-      />
-    </div>
-  );
-
-  const hospitalEntry = (
-    <div>
-      <TextField
-        label="Discharge criteria"
-        variant="standard"
-        fullWidth
-        value={dischargeCriteria}
-        onChange={({ target }) => setDischargeCriteria(target.value)}
-        style={inputStyle}
-      />
-      <TextField
-        label="Discharge date"
-        variant="standard"
-        fullWidth
-        value={dischargeDate}
-        onChange={({ target }) => setDischargeDate(target.value)}
-        style={inputStyle}
-      />
-    </div>
-  );
-
   const tabs: Array<EntryTab> = [
     {
       entryType: 'HealthCheck',
       label: 'Health check',
-      component: healthCheck,
+      component: (
+        <HealthCheckTab
+          textFieldStyle={inputStyle}
+          healthRating={healthRating}
+          setHealthRating={setHealthRating}
+        />
+      ),
     },
     {
       entryType: 'OccupationalHealthcare',
       label: 'Occupational',
-      component: occupational,
+      component: (
+        <OccupationalEntryTab
+          textFieldStyle={inputStyle}
+          employerName={employerName}
+          setEmployerName={setEmployerName}
+          sickLeaveEnabled={sickLeaveEnabled}
+          setSickLeaveEnabled={setSickLeaveEnabled}
+          sickLeaveStart={sickLeaveStart}
+          setSickLeaveStart={setSickLeaveStart}
+          sickLeaveEnd={sickLeaveEnd}
+          setSickLeaveEnd={setSickLeaveEnd}
+        />
+      ),
     },
     {
       entryType: 'Hospital',
       label: 'Hospital entry',
-      component: hospitalEntry,
+      component: (
+        <HospitalEntryTab
+          textFieldStyle={inputStyle}
+          dischargeCriteria={dischargeCriteria}
+          setDischargeCriteria={setDischargeCriteria}
+          dischargeDate={dischargeDate}
+          setDischargeDate={setDischargeDate}
+        />
+      ),
     },
   ];
 
