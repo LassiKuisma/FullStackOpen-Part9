@@ -129,6 +129,10 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
     }
   };
 
+  const availableDiagnosisCodes = Array.from(diagnoses.values()).map(
+    (d) => d.code
+  );
+
   return (
     <div>
       <h2>
@@ -149,6 +153,7 @@ const PatientInfoPage = ({ id, diagnoses }: Props) => {
         Add new entry
       </Button>
       <NewEntryForm
+        availableDiagnosisCodes={availableDiagnosisCodes}
         showWhenVisible={showWhenVisible}
         closeEntryForm={closeEntryForm}
         submitNewEntry={submitNewEntry}

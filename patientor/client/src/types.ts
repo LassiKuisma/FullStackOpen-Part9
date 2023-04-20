@@ -37,7 +37,7 @@ export enum HealthCheckRating {
   'CriticalRisk' = 3,
 }
 
-interface BaseEntry {
+export interface BaseEntry {
   id: string;
   description: string;
   date: string;

@@ -1,12 +1,28 @@
-import { Box, Button, Grid, Tab, Tabs, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  Grid,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
+  Tab,
+  Tabs,
+  TextField,
+} from '@mui/material';
 import React, { SyntheticEvent, useState } from 'react';
-import { Entry, EntryWithoutId } from '../../types';
-import { assertNever, stringToHealthCheckRating } from '../../util';
+import { Diagnosis, Entry, EntryWithoutId } from '../../types';
+import { submittableEntryFromValues } from '../../util';
 import HealthCheckTab from './EntryVariants/HealthCheck';
 import OccupationalEntryTab from './EntryVariants/OccupationalEntry';
 import HospitalEntryTab from './EntryVariants/HospitalEntry';
 
 interface Props {
+  availableDiagnosisCodes: Array<Diagnosis['code']>;
   showWhenVisible: React.CSSProperties;
   closeEntryForm: () => void;
   submitNewEntry: (entry: EntryWithoutId) => Promise<boolean>;
@@ -22,7 +38,19 @@ const inputStyle: React.CSSProperties = {
   margin: '3px',
 };
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const CodeSelectProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 const NewEntryForm = ({
+  availableDiagnosisCodes,
   showWhenVisible,
   closeEntryForm,
   submitNewEntry,
@@ -31,7 +59,7 @@ const NewEntryForm = ({
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
-  const [codes, setCodes] = useState('');
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const [healthRating, setHealthRating] = useState('');
 
@@ -44,6 +72,13 @@ const NewEntryForm = ({
   const [dischargeDate, setDischargeDate] = useState('');
 
   const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleCodeSelect = (event: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(typeof value === 'string' ? value.split(',') : value);
+  };
 
   const tabs: Array<EntryTab> = [
     {
@@ -93,7 +128,7 @@ const NewEntryForm = ({
     setDescription('');
     setDate('');
     setSpecialist('');
-    setCodes('');
+    setDiagnosisCodes([]);
 
     setHealthRating('');
 
@@ -109,78 +144,29 @@ const NewEntryForm = ({
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
 
-    const codesSplit =
-      codes.length !== 0
-        ? codes.split(',').map((code) => code.trim())
-        : undefined;
-
     const type = tabs[selectedTab].entryType;
-    let newEntry: EntryWithoutId | undefined = undefined;
 
-    switch (type) {
-      case 'HealthCheck':
-        const rating = stringToHealthCheckRating(healthRating);
-        if (rating.k === 'error') {
-          showError(`Invalid health check rating: ${rating.message}`);
-          return;
-        }
+    const newEntry = submittableEntryFromValues(
+      type,
+      description,
+      date,
+      specialist,
+      diagnosisCodes,
+      healthRating,
+      employerName,
+      sickLeaveEnabled,
+      sickLeaveStart,
+      sickLeaveEnd,
+      dischargeCriteria,
+      dischargeDate
+    );
 
-        newEntry = {
-          type: 'HealthCheck',
-          description,
-          date,
-          specialist,
-          diagnosisCodes: codesSplit,
-          healthCheckRating: rating.value,
-        };
-        break;
-
-      case 'OccupationalHealthcare':
-        const sickLeave = sickLeaveEnabled
-          ? {
-              startDate: sickLeaveStart,
-              endDate: sickLeaveEnd,
-            }
-          : undefined;
-
-        newEntry = {
-          type: 'OccupationalHealthcare',
-          description,
-          date,
-          specialist,
-          diagnosisCodes: codesSplit,
-          employerName,
-          sickLeave,
-        };
-        break;
-
-      case 'Hospital':
-        const discharge = {
-          date: dischargeDate,
-          criteria: dischargeCriteria,
-        };
-
-        newEntry = {
-          type: 'Hospital',
-          description,
-          date,
-          specialist,
-          diagnosisCodes: codesSplit,
-          discharge,
-        };
-        break;
-
-      default:
-        assertNever(type);
-        break;
-    }
-
-    if (!newEntry) {
-      showError(`Entry type is invalid: '${type}'`);
+    if (newEntry.k === 'error') {
+      showError(newEntry.message);
       return;
     }
 
-    const success = await submitNewEntry(newEntry);
+    const success = await submitNewEntry(newEntry.value);
     if (!success) {
       // error message should be set in callback
       return;
@@ -202,6 +188,7 @@ const NewEntryForm = ({
         <TextField
           label="Description"
           variant="standard"
+          required={true}
           fullWidth
           value={description}
           onChange={({ target }) => setDescription(target.value)}
@@ -210,7 +197,9 @@ const NewEntryForm = ({
         <TextField
           label="Date"
           variant="standard"
-          fullWidth
+          type="Date"
+          required={true}
+          InputLabelProps={{ shrink: true, required: true }}
           value={date}
           onChange={({ target }) => setDate(target.value)}
           style={inputStyle}
@@ -218,19 +207,34 @@ const NewEntryForm = ({
         <TextField
           label="Specialist"
           variant="standard"
+          required={true}
           fullWidth
           value={specialist}
           onChange={({ target }) => setSpecialist(target.value)}
           style={inputStyle}
         />
-        <TextField
-          label="Diagnosis codes"
-          variant="standard"
-          fullWidth
-          value={codes}
-          onChange={({ target }) => setCodes(target.value)}
-          style={inputStyle}
-        />
+        <div>
+          <FormControl sx={{ m: 1, width: 300 }}>
+            <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+            <Select
+              labelId="diagnosis-codes-label"
+              id="diagnosis-codes"
+              multiple
+              value={diagnosisCodes}
+              onChange={handleCodeSelect}
+              input={<OutlinedInput label="Diagnosis codes" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={CodeSelectProps}
+            >
+              {availableDiagnosisCodes.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={diagnosisCodes.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
         <EntryTabs
           tabs={tabs}
           selectedTab={selectedTab}
