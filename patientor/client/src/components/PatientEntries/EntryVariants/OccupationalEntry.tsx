@@ -36,14 +36,15 @@ const OccupationalEntryTab = ({
       <div>
         Sick leave?
         <Checkbox
-          value={sickLeaveEnabled}
+          checked={sickLeaveEnabled}
           onChange={() => setSickLeaveEnabled(!sickLeaveEnabled)}
         />
       </div>
       <TextField
         label="Start"
         variant="standard"
-        fullWidth
+        type="Date"
+        InputLabelProps={{ shrink: true, required: true }}
         value={sickLeaveStart}
         onChange={({ target }) => setSickLeaveStart(target.value)}
         style={textFieldStyle}
@@ -52,7 +53,8 @@ const OccupationalEntryTab = ({
       <TextField
         label="End"
         variant="standard"
-        fullWidth
+        type="Date"
+        InputLabelProps={{ shrink: true, required: true }}
         value={sickLeaveEnd}
         onChange={({ target }) => setSickLeaveEnd(target.value)}
         style={textFieldStyle}
