@@ -28,7 +28,8 @@ const HospitalEntryTab = ({
       <TextField
         label="Discharge date"
         variant="standard"
-        fullWidth
+        type="Date"
+        InputLabelProps={{ shrink: true, required: true }}
         value={dischargeDate}
         onChange={({ target }) => setDischargeDate(target.value)}
         style={textFieldStyle}
