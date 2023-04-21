@@ -86,7 +86,6 @@ const NewEntryForm = ({
       label: 'Health check',
       component: (
         <HealthCheckTab
-          textFieldStyle={inputStyle}
           healthRating={healthRating}
           setHealthRating={setHealthRating}
         />

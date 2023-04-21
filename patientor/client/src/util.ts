@@ -113,6 +113,10 @@ const healthCheckEntryFromValues = (
   base: BaseEntryWithoutId,
   healthRating: string
 ): Result<Omit<HealthCheckEntry, 'id'>> => {
+  if (isEmpty(healthRating)) {
+    return error('Please select a health check rating.');
+  }
+
   const rating = healthCheckRatingFromString(healthRating);
   if (rating.k === 'error') {
     return error(`Invalid health check rating: ${rating.message}`);
