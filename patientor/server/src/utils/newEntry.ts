@@ -92,12 +92,8 @@ const parseHealthCheckEntry = (
   });
 };
 
-const isHealthCheckRating = (
-  param: string | number
-): param is HealthCheckRating => {
-  return Object.values(HealthCheckRating)
-    .map((h) => h.toString())
-    .includes(param.toString());
+const isHealthCheckRating = (param: number): param is HealthCheckRating => {
+  return Object.values(HealthCheckRating).includes(param);
 };
 
 const parseHealthCheckRating = (object: object): Result<HealthCheckRating> => {
@@ -106,12 +102,11 @@ const parseHealthCheckRating = (object: object): Result<HealthCheckRating> => {
   }
 
   const hcr = object.healthCheckRating;
-  const isStrOrNum = isString(hcr) || isNumber(hcr);
-  if (!isStrOrNum || !isHealthCheckRating(hcr)) {
-    return error('Invalid field: healthCheckRating');
+  if (isNumber(hcr) && isHealthCheckRating(hcr)) {
+    return ok(hcr);
   }
 
-  return ok(hcr);
+  return error('Invalid field: healthCheckRating');
 };
 
 const parseOccupationalEntry = (
